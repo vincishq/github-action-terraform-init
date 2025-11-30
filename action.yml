@@ -1,4 +1,4 @@
-name: "Terraform Init"
+name: "Vincis Terraform Init"
 description: "Terraform init to support multiple cloud providers"
 
 inputs:
