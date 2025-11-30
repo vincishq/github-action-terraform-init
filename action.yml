@@ -1,6 +1,10 @@
 name: "Vincis Terraform Init"
 description: "Terraform init to support multiple cloud providers"
 
+branding:
+  icon: power
+  color: purple
+
 inputs:
   cloud-provider:
     required: true
