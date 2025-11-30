@@ -1,0 +1,37 @@
+name: "Terraform Init"
+description: "Terraform init to support multiple cloud providers"
+
+inputs:
+  cloud-provider:
+    required: true
+    description: "Cloud provider for Terraform state backend. [Azure]"
+  backend-storage-name:
+    required: true
+    description: "Name of backend storage location. For Azure use storage account name."
+  tf-version:
+    required: false
+    description: "The version of Terraform to use. Defaults to latest."
+    default: "latest"
+
+outputs:
+  init-outcome:
+    description: "Terraform init command outcome"
+    value: ${{ steps.init.outcome }}
+
+runs:
+  using: "composite"
+  steps:
+    # Install the specified version of Terraform CLI
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: ${{ inputs.tf-version }}
+
+    # Initialize Terraform using the Azure backend
+    - name: Terraform Init Azure
+      if: inputs.cloud-provider == 'Azure'
+      id: init
+      shell: bash
+      run: |
+        terraform init -reconfigure \
+        -backend-config="storage_account_name=${{ inputs.backend-storage-name }}"
