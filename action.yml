@@ -8,10 +8,10 @@ branding:
 inputs:
   cloud-provider:
     required: true
-    description: "Cloud provider for Terraform state backend. [Azure]"
+    description: "Cloud provider for Terraform state backend. [Azure / S3]"
   backend-storage-name:
     required: true
-    description: "Name of backend storage location. For Azure use storage account name."
+    description: "Name of backend storage location. [Azure Storage Account Name / S3 Bucket Name]"
   tf-version:
     required: false
     description: "The version of Terraform to use. Defaults to latest."
@@ -39,3 +39,12 @@ runs:
       run: |
         terraform init -reconfigure \
         -backend-config="storage_account_name=${{ inputs.backend-storage-name }}"
+
+    # Initialize Terraform using the S3 backend
+    - name: Terraform Init S3
+      if: inputs.cloud-provider == 'S3'
+      id: init
+      shell: bash
+      run: |
+        terraform init \
+        -backend-config="bucket=${{ inputs.backend-storage-name }}"
