@@ -31,20 +31,21 @@ runs:
       with:
         terraform_version: ${{ inputs.tf-version }}
 
-    # Initialize Terraform using the Azure backend
-    - name: Terraform Init Azure
-      if: inputs.cloud-provider == 'Azure'
+    - name: Terraform Init
       id: init
       shell: bash
       run: |
-        terraform init -reconfigure \
-        -backend-config="storage_account_name=${{ inputs.backend-storage-name }}"
-
-    # Initialize Terraform using the S3 backend
-    - name: Terraform Init S3
-      if: inputs.cloud-provider == 'S3'
-      id: init
-      shell: bash
-      run: |
-        terraform init \
-        -backend-config="bucket=${{ inputs.backend-storage-name }}"
+        case "${{ inputs.cloud-provider }}" in
+          Azure)
+            terraform init -reconfigure \
+              -backend-config="storage_account_name=${{ inputs.backend-storage-name }}"
+            ;;
+          S3)
+            terraform init \
+              -backend-config="bucket=${{ inputs.backend-storage-name }}"
+            ;;
+          *)
+            echo "Unsupported cloud provider: ${{ inputs.cloud-provider }}"
+            exit 1
+            ;;
+        esac
